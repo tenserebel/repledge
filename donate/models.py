@@ -9,3 +9,4 @@ class donate(models.Model):
     category = models.CharField(max_length=200)
     pickup = models.DateField(auto_now_add=True)
     location = models.CharField(max_length=500) 
+    location_link = models.URLField(max_length=500,blank=True)

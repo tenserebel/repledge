@@ -19,18 +19,19 @@ from .models import donate
 @api_view(["GET","POST"])
 def index(request):
     if request.method == 'GET':
-        serializer = donateSerializer(donate.objects.all(), many=True)
-        return Response(serializer.data)
+        serializer1 = donateSerializer(donate.objects.all(), many=True)
+        return Response(serializer1.data)
 
     elif request.method == 'POST':
-        serializer = donateSerializer(data=request.data)
+        serializer1 = donateSerializer(data=request.data)
+        if serializer1.is_valid():
+            serializer1.validated_data['location_link'] = f"https://www.google.com/maps/place/{serializer1.validated_data['location']}"
+            # serializer1.objects.location_link = f"https://www.google.com/maps/place/{serializer1.objects.location}"
+            serializer1.save()
 
-        if serializer.is_valid():
-            serializer.save()
+            return Response(serializer1.data, status=status.HTTP_201_CREATED)
 
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer1.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(["GET","PUT","DELETE"])
 def details(request, pk):
@@ -48,6 +49,7 @@ def details(request, pk):
         serializer = donateSerializer(donation, data=request.data)
 
         if serializer.is_valid():
+            serializer.validated_data['location_link'] = f"https://www.google.com/maps/place/{serializer.validated_data['location']}"
             serializer.save()
 
             return Response(serializer.data)
@@ -56,3 +58,5 @@ def details(request, pk):
     elif request.method == 'DELETE': 
         donation.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
